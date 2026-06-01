@@ -1,0 +1,15 @@
+[project]
+name = "zp-hcp-codesandbox"
+version = "0.0.0"
+description = "ZenPay Hosted Checkout demo — FastAPI backend + v6 zp-* frontend, deployable on CodeSandbox"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.34.0",
+    "httpx>=0.28.0",
+    "python-dotenv>=1.0.0",
+    "pyjwt[crypto]>=2.8.0",
+]
+
+[project.scripts]
+dev = "uvicorn app.main:app --reload --port ${PORT:-3000}"

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://codesandbox.io/schemas/tasks.json",
+  "setupTasks": [
+    {
+      "name": "Install dependencies",
+      "command": "uv sync"
+    }
+  ],
+  "tasks": {
+    "dev": {
+      "name": "Start dev server",
+      "command": "uv run uvicorn app.main:app --host 0.0.0.0 --port 8080",
+      "runAtStart": true,
+      "preview": {
+        "port": 8080
+      }
+    }
+  }
+}

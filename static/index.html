@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TravelPay Hosted Checkout — Python FastAPI</title>
+
+  <!-- Cloudflare Turnstile (explicit render — matches valtown) -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --zen-red: #cf2e2e;
+      --zen-red-hover: #b52525;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0f0f;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    .hero {
+      padding: 3rem 2rem 1.5rem;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--zen-red);
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-lede {
+      font-size: 0.9rem;
+      color: #888;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .grid {
+      display: flex;
+      justify-content: center;
+      padding: 1rem 2rem 3rem;
+    }
+
+    .card {
+      background: #1a1a1a;
+      border-radius: 1rem;
+      padding: 2rem;
+      width: 100%;
+      max-width: 640px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 15px 40px rgba(0,0,0,0.4);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    @media (max-width: 500px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .field label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #888;
+    }
+
+    .field input, .field select {
+      padding: 0.6rem 0.7rem;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: #1e1e1e;
+      color: #e0e0e0;
+      font-size: 0.88rem;
+    }
+
+    .field input:focus, .field select:focus {
+      outline: none;
+      border-color: var(--zen-red);
+    }
+
+    .payment-methods-label {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #888;
+      margin-bottom: 0.5rem;
+    }
+
+    .payment-methods-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.6rem;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #999;
+      font-size: 0.78rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox-label:has(input:checked) {
+      border-color: var(--zen-red);
+      color: var(--zen-red);
+    }
+
+    .actions button {
+      width: 100%;
+      padding: 0.85rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      background: var(--zen-red);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .actions button:hover:not(:disabled) { background: var(--zen-red-hover); }
+    .actions button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .back-link { margin-top: 0.5rem; }
+    .back-link a { color: #888; font-size: 0.8rem; }
+  </style>
+  <script type="module" src="/static/launch.js"></script>
+</head>
+<body>
+<main>
+  <div class="hero">
+    <p class="hero-eyebrow">TravelPay · Python FastAPI</p>
+    <h1 class="hero-title">Try a hosted checkout.</h1>
+    <p class="hero-lede">
+      A sandbox demo of the TravelPay hosted checkout flow — Python FastAPI backend
+      with v6 zp-* frontend. Same flow as valtown, different backend stack.
+    </p>
+  </div>
+
+  <div class="grid">
+    <form id="payment-form" class="card">
+      <div class="form-grid">
+        <div class="field">
+          <label for="paymentAmount">Amount</label>
+          <input id="paymentAmount" name="paymentAmount" type="number" min="10" max="999.99" step="0.01" required />
+        </div>
+        <div class="field">
+          <label for="mode">Payment mode</label>
+          <select id="mode" name="mode">
+            <option value="0">0 &ndash; Make Payment</option>
+            <option value="1">1 &ndash; Tokenise</option>
+            <option value="2">2 &ndash; Custom Payment</option>
+            <option value="3">3 &ndash; Pre-authorisation</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="displayMode">Display mode</label>
+          <select id="displayMode" name="displayMode">
+            <option value="0">0 &ndash; Modal</option>
+            <option value="1">1 &ndash; Redirection</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="customerName">Customer name</label>
+          <input id="customerName" name="customerName" value="Arthas Menethil" required />
+        </div>
+        <div class="field">
+          <label for="customerEmail">Customer email</label>
+          <input id="customerEmail" name="customerEmail" type="email" value="arthas@zenpay.com.au" required />
+        </div>
+        <div class="field">
+          <label for="customerReference">Customer reference</label>
+          <input id="customerReference" name="customerReference" required />
+        </div>
+        <div class="field">
+          <label for="contactNumber">Contact number</label>
+          <input id="contactNumber" name="contactNumber" value="0400000000" />
+        </div>
+      </div>
+
+      <div>
+        <span class="payment-methods-label">Payment methods</span>
+        <div class="payment-methods-grid">
+          <label class="checkbox-label"><input type="checkbox" name="allowApplePayOneOffPayment" />Apple Pay</label>
+          <label class="checkbox-label"><input type="checkbox" name="allowGooglePayOneOffPayment" />Google Pay</label>
+          <label class="checkbox-label"><input type="checkbox" name="allowUnionPayOneOffPayment" />UnionPay</label>
+          <label class="checkbox-label"><input type="checkbox" name="allowAliPayPlusOneOffPayment" />Alipay+</label>
+          <label class="checkbox-label"><input type="checkbox" name="allowBankAcOneOffPayment" />Bank Account</label>
+          <label class="checkbox-label"><input type="checkbox" name="allowPayToOneOffPayment" />PayTo</label>
+          <label class="checkbox-label"><input type="checkbox" name="allowPayIdOneOffPayment" />PayID</label>
+          <label class="checkbox-label"><input type="checkbox" name="allowSaveCardUserOption" />Save Card Opt-In</label>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="launch-button" type="submit">Initialize checkout</button>
+      </div>
+    </form>
+  </div>
+</main>
+
+  <!-- Turnstile site key (test key — always passes in dev) -->
+  <script>window.__ZP = { turnstileSiteKey: '1x00000000000000000000AA' };</script>
+
+</body>
+</html>

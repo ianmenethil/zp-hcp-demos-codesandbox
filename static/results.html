@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment results · TravelPay Hosted Checkout</title>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root { --zen-red: #cf2e2e; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0f0f;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    .hero {
+      padding: 3rem 2rem 1.5rem;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--zen-red);
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-lede {
+      font-size: 0.9rem;
+      color: #888;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .hero-lede code {
+      background: rgba(255,255,255,0.06);
+      padding: 0.1em 0.35em;
+      border-radius: 4px;
+      font-size: 0.82em;
+    }
+
+    .back-link { margin-top: 0.5rem; }
+    .back-link a { color: #888; font-size: 0.8rem; }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem 2rem 3rem;
+    }
+
+    @media (max-width: 640px) {
+      .results-grid { grid-template-columns: 1fr; }
+    }
+
+    .results-panel {
+      background: #1a1a1a;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
+    }
+
+    .results-panel--pending {
+      border: 1px solid rgba(207,46,46,0.3);
+    }
+
+    .results-panel h2 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #888;
+      margin-bottom: 1rem;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    .kv-table {
+      width: 100%;
+      font-size: 0.78rem;
+      border-collapse: collapse;
+    }
+
+    .kv-table th, .kv-table td {
+      padding: 0.35rem 0.5rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .kv-table th {
+      color: #888;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .kv-table td code {
+      color: #ccc;
+      word-break: break-all;
+    }
+
+    .empty-state { color: #666; font-size: 0.82rem; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <p class="hero-eyebrow">TravelPay · Python FastAPI</p>
+    <h1 class="hero-title">Payment results</h1>
+    <p class="hero-lede">
+      Returned from hosted checkout via <code>redirectUrl</code>.
+      Redirect query parameters are on the left;
+      server callback data (streamed by payment id) appears on the right.
+    </p>
+    <p class="back-link"><a href="/">← Back to checkout demo</a></p>
+  </div>
+
+  <div class="results-grid">
+    <!-- LEFT: redirect query params (display only — not trusted) -->
+    <div class="results-panel">
+      <h2>Redirect query parameters</h2>
+      <div id="redirect-params"></div>
+    </div>
+
+    <!-- RIGHT: server callback via SSE (authoritative) -->
+    <div class="results-panel results-panel--pending" id="callback-panel">
+      <h2>Callback (server POST)</h2>
+      <div id="callback-poll-root">
+        <p class="empty-state">Waiting for server callback…</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/static/stream.js"></script>
+
+  <script>
+    // Render redirect query params (display only — untrusted, per valtown)
+    (function () {
+      const container = document.getElementById('redirect-params');
+      const params = new URLSearchParams(window.location.search);
+      const entries = [...params.entries()].sort(([a], [b]) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+      if (entries.length === 0) {
+        container.innerHTML = '<p class="empty-state">No query parameters on this URL.</p>';
+        return;
+      }
+      const rows = entries.map(([k, v]) => {
+        const esc = (s) => String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+        return `<tr><th>${esc(k)}</th><td><code>${esc(v)}</code></td></tr>`;
+      }).join('');
+      container.innerHTML = `<div class="table-wrap"><table class="kv-table"><thead><tr><th scope="col">Parameter</th><th scope="col">Value</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    })();
+  </script>
+</body>
+</html>
