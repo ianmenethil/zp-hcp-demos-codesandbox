@@ -1,5 +1,5 @@
 """
-FastAPI entry point — mirrors valtown's app.ts structure.
+FastAPI entry point for the ZenPay HCP demo.
 
 Mounts all API routes under /api/v1/, serves static front-end files,
 and serves the /results page.
@@ -47,7 +47,7 @@ async def results_page():
     return HTMLResponse(results_path.read_text(encoding="utf-8"))
 
 
-# --- API routes (matching valtown's basePath + route structure) ---
+# --- API routes ---
 app.include_router(init.router, prefix="/api/v1/init")
 app.include_router(exchange.router, prefix="/api/v1/exchange")
 app.include_router(callbacks.router, prefix="/api/v1/callbacks")

@@ -1,7 +1,10 @@
 """
-POST /api/v1/ping — open the lifecycle gate.
+POST /api/v1/ping — open the callback gate for a payment session.
 
-Python FastAPI port of valtown's ping.ts — same API flow, adapted for Python async patterns.
+Called when the hosted checkout modal opens (zp-hcp client). Sets the launch
+record state to `open` and starts a TTL (`GATE_TTL_MS`) during which `/callbacks`
+will accept the ZenPay POST. Returns 404 if no launch record exists for the
+merchantUniquePaymentId (exchange must run first).
 """
 
 import logging

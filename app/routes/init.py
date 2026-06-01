@@ -1,7 +1,14 @@
 """
-POST /api/v1/init — Turnstile siteverify → issue exchange token.
+POST /api/v1/init — verify Turnstile and issue an exchange token.
 
-Python FastAPI port of valtown's init.ts — same API flow, adapted for Python async patterns.
+First server step in the demo checkout flow. The browser sends Cloudflare Turnstile
+proof plus payment context (mode, amount, merchantUniquePaymentId, UTC timestamp).
+This route confirms the challenge with Cloudflare, then returns a short-lived signed
+JWT the client passes to POST /api/v1/exchange to build the payment fingerprint.
+
+Merchant credentials never leave the server; the exchange token only carries the
+fields needed for the next step. A missing device-fingerprint cookie (zp_dfp) is
+logged but does not block the response.
 """
 
 import os

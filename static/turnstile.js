@@ -1,7 +1,5 @@
 /**
  * Cloudflare Turnstile — renders one invisible widget, executes on demand.
- *
- * Mirrors valtown's browser/turnstile.ts 1:1.
  */
 
 const TURNSTILE_ACTION = 'demo-init';

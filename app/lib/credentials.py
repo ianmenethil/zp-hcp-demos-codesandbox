@@ -1,9 +1,12 @@
 """
-Merchant credentials from environment variables.
+Server-side merchant credentials for ZenPay API hashing.
 
-Mirrors valtown's `src/lib/creds.ts` and express-bs5's `server/lib/credentials.js` 1:1.
+Reads apiKey, username, password, and merchantCode from environment variables
+(`ZP_API_KEY`, `ZP_USERNAME`, `ZP_PASSWORD`, `ZP_MERCHANT_CODE`). Used by
+`/exchange` (fingerprint) and `/callbacks` (ValidationCode) only on the server.
 
-Secrets (username, password) stay on the server — never send them to the browser.
+Username and password must never be sent to the browser or embedded in client
+code — they participate only in SHA3-512 digests built here.
 """
 
 import os

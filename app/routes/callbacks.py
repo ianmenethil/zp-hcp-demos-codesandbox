@@ -1,15 +1,18 @@
 """
-POST /api/v1/callbacks — receive and verify ZenPay callback.
+POST /api/v1/callbacks — receive and verify the ZenPay hosted-page callback.
 
-Python FastAPI port of valtown's callbacks.ts — same API flow, adapted for Python async patterns.
+Called by the HPP after payment. Requires an open gate for the
+merchantUniquePaymentId (opened via `/ping`). Recomputes ValidationCode and
+compares timing-safely; on success marks the launch record completed so `/stream`
+can push the result to the browser. Idempotent for duplicate posts.
 
-ValidationCode field order (integration-guide.md §9, callback-handler.js:130-138, express callbacks.js:70-78):
+ValidationCode field order (integration guide §9):
   sha3_512(apiKey|username|password|mode|amountCENTS|merchantUniquePaymentId|reference)
 
-Reference field by mode:
-  Mode 0/2 → PaymentReference
-  Mode 1   → Token
-  Mode 3   → PreauthReference
+Reference field by operating mode:
+  Mode 0/2 → paymentReference
+  Mode 1   → token
+  Mode 3   → preauthReference
 """
 
 import logging
@@ -59,7 +62,7 @@ class CallbackBody(BaseModel):
 def _reference_for_mode(response: dict[str, Any], mode: int) -> str | None:
     """Resolves the HPP reference field for callback hash verification by operating mode.
 
-    Ported from valtown callbacks.ts:referenceForMode and express callbacks.js:referenceForMode."""
+    Mode 0/2 → paymentReference, mode 3 → preauthReference, mode 1 → token."""
     if mode == 0 or mode == 2:
         return response.get("paymentReference")
     if mode == 3:
@@ -77,7 +80,7 @@ async def callbacks_route(body: CallbackBody):
         mupid = payload["merchantUniquePaymentId"]
         logger.info("[callbacks] received merchantUniquePaymentId=%s", mupid)
 
-        # --- Gate check (match valtown — 404 if gate not open) ---
+        # --- Gate check (404 if gate not open) ---
         record = await get_launch_record(mupid)
         if not is_gate_open(record):
             logger.warning(

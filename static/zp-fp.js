@@ -1,7 +1,5 @@
 /**
  * Turnstile-gated init → exchange flow for the server-generated payment hash.
- *
- * Mirrors valtown's browser/fingerprint.ts 1:1.
  */
 
 import { PATHS } from './hcp.js';

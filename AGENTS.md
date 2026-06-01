@@ -2,8 +2,7 @@
 
 **Location:** `examples/codesandbox/`  
 **Role:** Reference for the v6 `zpPayment` integration with a Python FastAPI backend.  
-**Canonical spec:** `examples/valtown/` — this example mirrors valtown's flow, endpoints, and security posture 1:1.  
-**Sibling reference:** `examples/express-bs5/` — same flow on Express/Node.js.
+**Canonical spec:** `examples/valtown/` — this example mirrors valtown's flow, endpoints, and security posture 1:1.
 
 ---
 
@@ -88,7 +87,7 @@ examples/codesandbox/
     index.html                # Landing + launch form
     results.html              # Results page
     app.js                    # Orchestrator: Turnstile → init/exchange → plugin
-    fingerprint.js            # init→exchange client
+    fp.js                     # init→exchange client
     hcp.js                    # zpPayment v6 config + redirect launch
     observer.js               # Iframe lifecycle → ping/pong
     turnstile.js              # Cloudflare Turnstile
@@ -204,7 +203,7 @@ Every tracked file under `examples/codesandbox/` and its valtown equivalent.
 | `index.html` | `src/web/root/page.tsx` | Landing form, Turnstile script, v6 plugin |
 | `results.html` | `src/web/results/page.tsx` | Results shell |
 | `app.js` | `browser/launch.ts` | Orchestrator: Turnstile → init/exchange → plugin |
-| `fingerprint.js` | `browser/fingerprint.ts` | init→exchange client |
+| `fp.js` | `browser/fp.ts` | init→exchange client |
 | `hcp.js` | `browser/zp-hcp.ts` | `zpPayment` v6 config + redirect launch |
 | `observer.js` | `browser/zp-obs.ts` | Iframe lifecycle → ping/pong (uses `@ianmenethil/zp-observer`) |
 | `turnstile.js` | `browser/turnstile.ts` | Cloudflare Turnstile |
@@ -215,7 +214,7 @@ Every tracked file under `examples/codesandbox/` and its valtown equivalent.
 
 | File | Purpose |
 |------|---------|
-| `test_hash_parity.py` | Cross-language SHA3-512 parity against express-bs5 fixed vector |
+| `test_hash_parity.py` | Cross-language SHA3-512 parity — Python must match Node.js @noble/hashes output |
 
 ---
 
@@ -289,7 +288,7 @@ This example mirrors valtown's flow, endpoints, and state machine 1:1. The front
 
 ### 5.5 Hash parity
 
-The #1 risk is cross-language hash stringification. Python `hashlib.sha3_512` and JavaScript `@noble/hashes` `sha3_512` must produce identical hex output for the same `"|".join(fields)` input. A parity test (`tests/test_hash_parity.py`) verifies this against a fixed vector from the express-bs5 reference.
+The #1 risk is cross-language hash stringification. Python `hashlib.sha3_512` and JavaScript `@noble/hashes` `sha3_512` must produce identical hex output for the same `"|".join(fields)` input. A parity test (`tests/test_hash_parity.py`) verifies this against a fixed vector computed with Node.js @noble/hashes sha3_512.
 
 ### 5.6 Device fingerprint cookie
 
@@ -1069,7 +1068,6 @@ Point to:
 
 - This file for lifecycle and gotchas.
 - `examples/valtown/` for the canonical TypeScript/Hono/v6 reference.
-- `examples/express-bs5/` for the Express/Node.js v3 reference.
 - Main docs site HPP guides for branded copy (this sample is TravelPay sandbox).
 
 ### 17.6 Do not run
@@ -1086,7 +1084,7 @@ Point to:
 - **Do not** compute fingerprints, ValidationCode, or HMAC exchange tokens in the browser
 - **Do not** convert the frontend to TypeScript
 - **Do not** swap FastAPI for Hono/Express/Flask
-- **Do not** modify the valtown or express-bs5 examples
+- **Do not** modify the valtown example
 - **Do not** add a `package.json` — this is NOT a pnpm workspace package
 - **Do not** commit `.env`
 - **Do not** expose stack traces or internal errors in JSON API responses
@@ -1120,7 +1118,6 @@ Point to:
 | Document | Path |
 |----------|------|
 | Canonical reference (v6 + Deno) | `examples/valtown/AGENTS.md` |
-| v3 Express/Node.js reference | `examples/express-bs5/AGENTS.md` |
 | Docs site HCP guides | `docs/` under docusaurus-2 (integration-options/hosted-checkout) |
 | Main project agents | `docusaurus-2/AGENTS.md` |
 | Playground code samples | `docusaurus-2/src/pages/playground/_code-editor/code-samples/` |
@@ -1418,7 +1415,6 @@ This master doc was synthesized from:
 
 - `examples/codesandbox/**` (live sample)
 - `examples/valtown/**` (canonical v6/Deno reference)
-- `examples/express-bs5/**` (v3/Express reference)
 - `im-zp-hcp-agent` skill: `integration/integration-guide.md`, `v6/v6-reference.md`, `hosted-page/hosted-page.md`, `integration/merchant-client.md`, `integration/merchant-server.md`, `parameters/*.csv`
 
 The #1 cross-language risk is hash stringification. When Python `hashlib.sha3_512` and JS `@noble/hashes` `sha3_512` disagree, the parity test (`tests/test_hash_parity.py`) is the authority. For parameter requiredness by mode, **CSV wins**.

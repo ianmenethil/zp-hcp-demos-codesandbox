@@ -1,7 +1,9 @@
 """
-POST /api/v1/pong — close the lifecycle gate.
+POST /api/v1/pong — close the callback gate when checkout is dismissed.
 
-Python FastAPI port of valtown's pong.ts — same API flow, adapted for Python async patterns.
+Called when the shopper closes the hosted checkout modal without completing
+payment. Sets the launch record state to `closed` so late callbacks are rejected.
+Returns 404 when there is no open gate; expired gates are cleaned up on request.
 """
 
 import logging

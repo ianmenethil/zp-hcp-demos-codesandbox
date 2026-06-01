@@ -1,7 +1,5 @@
 /**
  * Device fingerprint — KEEPS @ianmenethil/zp-devicefp esm.sh import.
- *
- * Mirrors valtown's browser/zp-dfp.ts exactly.
  */
 import {
   createFingerprintClient,

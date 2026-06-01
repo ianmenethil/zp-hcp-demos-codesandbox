@@ -1,13 +1,13 @@
 /**
  * Launch orchestrator: Turnstile → init/exchange → ZenPay plugin.
  *
- * Mirrors valtown's browser/launch.ts 1:1, using v6 zpPayment from esm.sh.
+ * Uses v6 zpPayment from esm.sh CDN.
  */
 
 import './dfp.js';
 import { createZpMupid, createZpTimestamp } from 'https://esm.sh/@ianmenethil/zp-hcp/client';
 import { getTurnstileToken, prepareTurnstile } from './turnstile.js';
-import { fetchSecureHash } from './fingerprint.js';
+import { fetchSecureHash } from './fp.js';
 import { buildZenPayConfig, launchZenPay, zpPayment } from './hcp.js';
 import { runObserverDemo } from './obs.js';
 
@@ -58,6 +58,8 @@ function readFormFields(form) {
     allowPayToOneOffPayment: bool('allowPayToOneOffPayment'),
     allowPayIdOneOffPayment: bool('allowPayIdOneOffPayment'),
     allowSaveCardUserOption: bool('allowSaveCardUserOption'),
+    redirectOnError: bool('redirectOnError'),
+    isJsPlugin: bool('isJsPlugin'),
   };
 }
 
@@ -111,6 +113,8 @@ form?.addEventListener('submit', async (event) => {
       allowPayToOneOffPayment: fields.allowPayToOneOffPayment,
       allowPayIdOneOffPayment: fields.allowPayIdOneOffPayment,
       allowSaveCardUserOption: fields.allowSaveCardUserOption,
+      redirectOnError: fields.redirectOnError,
+      isJsPlugin: fields.isJsPlugin,
     });
   } catch (error) {
     console.error('[launch] failed:', error);

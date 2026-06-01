@@ -1,10 +1,15 @@
 """
-POST /api/v1/exchange — verify token → fingerprint → launch record.
+POST /api/v1/exchange — verify exchange token and return the payment fingerprint.
 
-Python FastAPI port of valtown's exchange.ts — same API flow, adapted for Python async patterns.
+Second server step after `/init`. Accepts the short-lived JWT from init, verifies
+it once (replay-protected via exchange records), loads merchant credentials from
+the environment, and returns the SHA3-512 fingerprint the browser passes to the
+hosted checkout plugin. Creates the launch record used by ping/pong/callbacks/stream.
 
-Fingerprint field order (integration-guide.md §4, fingerprint.js:117-125, express exchange.js:96-107):
+Fingerprint field order (integration guide §4):
   sha3_512(apiKey|username|password|mode|amountCENTS|merchantUniquePaymentId|timestamp)
+
+Mode 2 (custom payment): amount in the hash is forced to `"0"`.
 """
 
 import hashlib
@@ -136,7 +141,7 @@ async def exchange_route(body: ExchangeRequest, request: Request):
             merchant_unique_payment_id, payment_amount_cents, len(fingerprint),
         )
 
-        # --- Persist records BEFORE returning (match valtown order) ---
+        # --- Persist records BEFORE returning ---
         now = datetime.now(timezone.utc).isoformat()
         await set_exchange_record(token_hash, {
             "merchantUniquePaymentId": merchant_unique_payment_id,

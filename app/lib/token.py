@@ -1,8 +1,12 @@
 """
-HMAC-SHA256 token signing and verification for init→exchange flow.
+Signed exchange tokens between `/init` and `/exchange`.
 
-Uses PyJWT for standard base64url-encoded tokens instead of hand-rolled
-hex HMAC signatures. Matches valtown's hono/jwt behaviour.
+Issues and verifies short-lived HMAC-SHA256 JWTs that carry payment context
+(mode, amount, merchantUniquePaymentId, timestamp) without exposing merchant
+secrets. The `purpose` claim must be `fingerprint` (see `EXCHANGE_TOKEN_PURPOSE`).
+
+`sign_token` — called from init after Turnstile passes
+`verify_token` — called from exchange; returns claims or None if invalid/expired
 """
 
 import time
@@ -16,7 +20,7 @@ from app.lib.constants import JWT_ALG, EXCHANGE_TOKEN_PURPOSE
 def sign_token(claims: dict[str, Any], secret: str) -> str:
     """Creates a standard HMAC-SHA256 signed JWT using PyJWT.
 
-    Returns a base64url-encoded token compatible with valtown's hono/jwt format.
+    Returns a standard HMAC-SHA256 signed JWT (base64url-encoded).
 
     Args:
         claims: Dictionary of JWT claims (purpose, mode, paymentAmount, etc.)

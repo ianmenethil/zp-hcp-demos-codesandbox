@@ -1,7 +1,12 @@
 """
-GET /api/v1/stream — SSE endpoint that pushes callback data to the browser.
+GET /api/v1/stream — Server-Sent Events for verified callback results.
 
-Python FastAPI port of valtown's stream.ts — same SSE flow, adapted for Python async patterns.
+Long-polls the in-memory launch record until the payment callback is verified
+and stored, then pushes one `callback` event to the checkout page. Used so the
+merchant page learns the outcome without exposing credentials to the browser.
+
+Query: `merchantUniquePaymentId` (required). Returns 404 if no session, 410 if
+already consumed. Times out after ~90s with a `timeout` event.
 """
 
 import asyncio

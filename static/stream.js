@@ -1,7 +1,5 @@
 /**
  * Results page — streams callback data via SSE when it arrives from the server.
- *
- * Adapts valtown's browser/results-stream.ts for the Python FastAPI backend.
  */
 
 import { PATHS, QUERY_PARAMS } from './hcp.js';

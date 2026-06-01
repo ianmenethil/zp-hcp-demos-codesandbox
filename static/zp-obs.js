@@ -1,7 +1,5 @@
 /**
  * Observer-backed ZenPay modal launch — KEEPS @ianmenethil/zp-observer esm.sh import.
- *
- * Mirrors valtown's browser/zp-obs.ts 1:1.
  */
 import { PATHS } from './hcp.js';
 import {
@@ -10,7 +8,7 @@ import {
   watchIframe,
   onPageHide,
   ZP_IFRAME_SELECTORS,
-} from 'https://esm.sh/@ianmenethil/zp-observer@2.0.1';
+} from 'https://esm.sh/@ianmenethil/zp-observer';
 
 const LIFECYCLE_CONFIG = {
   openAction: {

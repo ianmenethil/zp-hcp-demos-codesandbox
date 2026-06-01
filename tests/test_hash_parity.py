@@ -4,8 +4,8 @@ Cross-language SHA3-512 hash parity tests.
 Verifies that Python stdlib hashlib.sha3_512 produces the same output as
 JavaScript @noble/hashes sha3_512 for identical inputs.
 
-These expected values were computed by the express-bs5 reference implementation
-and MUST NOT be changed without re-verifying against the JavaScript output.
+These expected values were computed by running the JavaScript @noble/hashes sha3_512
+and MUST NOT be changed without re-verifying against that JavaScript output.
 """
 
 import sys
@@ -13,7 +13,7 @@ sys.path.insert(0, ".")  # simpler import when run from examples/codesandbox/
 
 from app.lib.hashing import sha3_512_hex, to_cents, payment_amount_to_cents
 
-# Fixed test vector — identical to what was run in express-bs5 Node.js
+# Fixed test vector — computed with Node.js @noble/hashes sha3_512
 API_KEY = "test_api_key_12345"
 USERNAME = "test_user"
 PASSWORD = "test_password"
@@ -23,7 +23,7 @@ MUPID = "test-mupid-hash-parity"
 TIMESTAMP = "2026-05-30T12:00:00"
 PAYMENT_REFERENCE = "ZP-PARITY-REF"
 
-# Expected values from express-bs5 JS (@noble/hashes sha3_512)
+# Expected values from Node.js @noble/hashes sha3_512
 EXPECTED_FINGERPRINT = (
     "bc7f4761a6c920a3fcce3931d3d8025f6e2b905a693bc85132102e3a101710d5"
     "d2b35da6411f5a625af4344166a8b1f3abcbd9fd555c5a4dbd5a6bb083f2eb82"

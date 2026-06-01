@@ -1,7 +1,5 @@
 /**
  * ZenPay HCP plugin wrapper — KEEPS @ianmenethil/zp-hcp esm.sh import.
- *
- * Mirrors valtown's browser/zp-hcp.ts 1:1.
  */
 import { zpPayment } from 'https://esm.sh/@ianmenethil/zp-hcp';
 
@@ -54,6 +52,8 @@ export function buildZenPayConfig(input) {
     allowPayToOneOffPayment: input.allowPayToOneOffPayment,
     allowPayIdOneOffPayment: input.allowPayIdOneOffPayment,
     allowSaveCardUserOption: input.allowSaveCardUserOption,
+    redirectOnError: input.redirectOnError,
+    isJsPlugin: input.isJsPlugin,
   };
 }
 

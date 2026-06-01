@@ -1,18 +1,24 @@
 {
-  "$schema": "https://codesandbox.io/schemas/tasks.json",
+  // These tasks will run in order when initializing your CodeSandbox project.
   "setupTasks": [
     {
-      "name": "Install dependencies",
-      "command": "uv sync"
+      "name": "Install uv",
+      "command": "curl -LsSf https://astral.sh/uv/install.sh | sh"
+    },
+    {
+      "name": "uv sync",
+      "command": "$HOME/.local/bin/uv sync"
     }
   ],
+
+  // These tasks can be run from CodeSandbox. Running one will open a log in the app.
   "tasks": {
     "dev": {
-      "name": "Start dev server",
-      "command": "uv run uvicorn app.main:app --host 0.0.0.0 --port 8080",
+      "name": "uv run uvicorn app.main:app --host 0.0.0.0 --port 8765",
+      "command": "$HOME/.local/bin/uv run uvicorn app.main:app --host 0.0.0.0 --port 8765",
       "runAtStart": true,
       "preview": {
-        "port": 8080
+        "port": 8765
       }
     }
   }

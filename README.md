@@ -65,8 +65,12 @@ cp .env.example .env
 # edit .env with your sandbox credentials
 
 uv sync
-uv run uvicorn app.main:app --reload --port 3000
+
+# Run from the codesandbox/ directory (not from inside app/)
+uv run python -m uvicorn app.main:app --host 127.0.0.1 --port 8765
 ```
+
+> **Note (Windows + Docker Desktop):** Docker Desktop probes port 8080 with non-HTTP bytes, causing `Invalid HTTP request received` spam in uvicorn. Use any other port (8765, 3000, etc.) locally. The CodeSandbox deployment on port 8765 is unaffected.
 
 ---
 
@@ -80,7 +84,6 @@ uv run uvicorn app.main:app --reload --port 3000
 | `ZP_PASSWORD` | Sandbox merchant password (server-side only) |
 | `EXCHANGE_TOKEN_SECRET` | Random string for HMAC-SHA256 token signing |
 | `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile secret (test: `1x0000000000000000000000000000000AA`) |
-| `PORT` | Server port (default `3000`) |
 
 ---
 
@@ -125,7 +128,7 @@ static/                    valtown browser/ modules ported to plain JS
   hcp.js                   zpPayment config + launch (KEEPS esm.sh zp-hcp import)
   obs.js                   Observer lifecycle (KEEPS esm.sh zp-observer import)
   dfp.js                   Device fingerprint (KEEPS esm.sh zp-devicefp import)
-  fingerprint.js           init→exchange client
+  fp.js                    init→exchange client
   turnstile.js             Cloudflare Turnstile
   stream.js                SSE consumer
 pyproject.toml             Python project config (uv/pip)
